@@ -1,19 +1,27 @@
 #!/usr/bin/python3
-import MySQLdb
-import sys
+""" Select states starting with N from database """
 
-if __name__ == "__main__":
 
-    con = MySQLdb.connect(host="localhost", port=3306, user=sys.argv[1],
-                          passwd=sys.argv[2], db=sys.argv[3])
-    cur = con.cursor()
+if __name__ == '__main__':
 
-    cur.execute("SELECT * FROM states WHERE name LIKE BINARY 'N%' ORDER BY id")
+    from sys import argv
+    import MySQLdb
 
-    rows = cur.fetchall()
+    db_user = argv[1]
+    db_passwd = argv[2]
+    db_name = argv[3]
 
-    for eachrow in rows:
-        print(eachrow)
+    database = MySQLdb.connect(host='localhost',
+                               port=3306,
+                               user=db_user,
+                               passwd=db_passwd,
+                               db=db_name)
 
-    cur.close()
-    con.close()
+    cursor = database.cursor()
+
+    cursor.execute('SELECT id, name FROM states\
+                   ORDER BY states.id ASC')
+
+    for row in cursor.fetchall():
+        if row[1][0] == 'N':
+            print(row)

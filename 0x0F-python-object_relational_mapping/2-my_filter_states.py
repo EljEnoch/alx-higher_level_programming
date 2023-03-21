@@ -1,20 +1,29 @@
 #!/usr/bin/python3
-import MySQLdb
-from sys import argv
+""" Select states with names matching arguments """
 
-if __name__ == "__main__":
 
-    con = MySQLdb.connect(host="localhost", port=3306, user=argv[1],
-                          passwd=argv[2], db=argv[3])
-    cur = con.cursor()
+if __name__ == '__main__':
 
-    sql = "SELECT * FROM states WHERE BINARY name = '{}'".format(argv[4])
-    cur.execute(sql + " ORDER BY id")
+    from sys import argv
+    import MySQLdb
 
-    rows = cur.fetchall()
+    db_user = argv[1]
+    db_passwd = argv[2]
+    db_name = argv[3]
+    search = argv[4]
 
-    for eachrow in rows:
-        print(eachrow)
+    database = MySQLdb.connect(host='localhost',
+                               port=3306,
+                               user=db_user,
+                               passwd=db_passwd,
+                               db=db_name)
 
-    cur.close()
-    con.close()
+    cursor = database.cursor()
+
+    cursor.execute('SELECT id, name FROM states\
+                   WHERE states.name = \'{}\'\
+                   ORDER BY states.id ASC'.format(search))
+
+    for row in cursor.fetchall():
+        if row[1] == search:
+            print(row)

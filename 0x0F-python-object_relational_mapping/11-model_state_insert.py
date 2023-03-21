@@ -1,28 +1,26 @@
 #!/usr/bin/python3
-"""
-Adds the new object
-"""
+""" List all state objects using sqlalchemy """
 
-if __name__ == "__main__":
-    from model_state import Base, State
+if __name__ == '__main__':
+
     from sys import argv
-    from sqlalchemy import (create_engine)
-    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm.session import sessionmaker, Session
+    from model_state import Base, State
 
-    engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'
-                           .format(argv[1], argv[2],
-                                   argv[3]), pool_pre_ping=True)
-    Base.metadata.create_all(engine)
+    username = '{}'.format(argv[1])
+    password = '{}'.format(argv[2])
+    db_name = '{}'.format(argv[3])
+
+    engine = create_engine('mysql+mysqldb://{}:{}@localhost:3306/{}'
+                           .format(username, password, db_name))
 
     Session = sessionmaker(bind=engine)
-
     session = Session()
 
-    new_obj = State(name='Louisiana')
-    session.add(new_obj)
+    session.add(State(name='Louisiana'))
+
+    for state in session.query(State).filter(State.name == 'Louisiana'):
+        print('{}'.format(state.id))
+
     session.commit()
-    state = session.query(State).filter(State.name == 'Louisiana').first()
-
-    print (state.id)
-
-    session.close()

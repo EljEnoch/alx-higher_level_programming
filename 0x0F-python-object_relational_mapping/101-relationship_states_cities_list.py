@@ -1,25 +1,29 @@
 #!/usr/bin/python3
-"""
-lists all State objects and corresponding City objects contained in a database
-"""
+""" List all state objects using sqlalchemy """
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from relationship_state import Base, State
 from relationship_city import City
+from sqlalchemy.orm.session import sessionmaker, Session
+from sqlalchemy import create_engine
 from sys import argv
 
 
-if __name__ == "__main__":
-    eng = create_engine("mysql+mysqldb://{}:{}@localhost/{}".format(argv[1],
-                                                                    argv[2],
-                                                                    argv[3]))
-    Base.metadata.create_all(eng)
-    Session = sessionmaker(bind=eng)
+if __name__ == '__main__':
+
+    username = argv[1]
+    password = argv[2]
+    db_name = argv[3]
+
+    engine = create_engine('mysql+mysqldb://{}:{}@localhost:3306/{}'
+                           .format(username, password, db_name))
+
+    Base.metadata.create_all(engine)
+
+    Session = sessionmaker(bind=engine)
     session = Session()
-    rows = session.query(State).order_by(State.id, City.id).all()
-    for state in rows:
-        print("{}: {}".format(state.id, state.name))
+
+    for state in session.query(State).\
+            order_by(State.id):
+        print('{}: {}'.format(state.id, state.name))
         for city in state.cities:
-            print("    {}: {}".format(city.id, city.name))
-    session.close()
+            print('\t{}: {}'.format(city.id, city.name))

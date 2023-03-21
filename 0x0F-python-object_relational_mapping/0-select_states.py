@@ -1,19 +1,25 @@
 #!/usr/bin/python3
+""" List all state in database """
+
+
+from sys import argv
 import MySQLdb
-import sys
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
-    con = MySQLdb.connect(host="localhost", port=3306, user=sys.argv[1],
-                          passwd=sys.argv[2], db=sys.argv[3])
-    cur = con.cursor()
+    db_user = argv[1]
+    db_passwd = argv[2]
+    db_name = argv[3]
 
-    cur.execute("SELECT * FROM states ORDER BY id")
+    database = MySQLdb.connect(host='localhost',
+                               port=3306,
+                               user=db_user,
+                               passwd=db_passwd,
+                               db=db_name)
 
-    rows = cur.fetchall()
+    cursor = database.cursor()
 
-    for eachrow in rows:
-        print(eachrow)
+    cursor.execute('SELECT id, name FROM states ORDER BY states.id ASC')
 
-    cur.close()
-    con.close()
+    for row in cursor.fetchall():
+        print(row)

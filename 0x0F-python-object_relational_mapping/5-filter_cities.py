@@ -1,24 +1,29 @@
 #!/usr/bin/python3
-import MySQLdb
+""" Select states with names matching arguments """
+
+
 from sys import argv
+import MySQLdb
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
-    con = MySQLdb.connect(host="localhost", port=3306, user=argv[1],
-                          passwd=argv[2], db=argv[3])
-    with con.cursor() as cur:
-        cur.execute("""
-            SELECT cities.name
-            FROM cities
-            JOIN states ON cities.state_id=states.id
-            WHERE BINARY states.name = %s
-            ORDER BY cities.id
-    """, (argv[4], ))
-        rows = cur.fetchall()
+    db_user = argv[1]
+    db_passwd = argv[2]
+    db_name = argv[3]
+    user_state = argv[4]
 
-        mysep = ""
-        for eachrow in rows:
-            print(mysep + str(*eachrow), end="")
-            mysep = ", "
+    database = MySQLdb.connect(host='localhost',
+                               port=3306,
+                               user=db_user,
+                               passwd=db_passwd,
+                               db=db_name)
 
-    print()
+    cursor = database.cursor()
+
+    cursor.execute('SELECT cities.name FROM cities\
+                   JOIN states\
+                   ON cities.state_id = states.id\
+                   WHERE states.name = %s\
+                   ORDER BY states.id ASC', (user_state,))
+    result = []
+    print(', '.join([value[0] for value in cursor.fetchall()]))
